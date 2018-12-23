@@ -4,9 +4,13 @@ python:
     - "2.7"
 before_install:
     - pip install pytest pytest-cov
+    - pip install coveralls
 
 install:
     - python setup.py install
 
 script:
     - py.test vis_sample/tests --cov vis_sample
+
+after_success:
+    - coveralls
