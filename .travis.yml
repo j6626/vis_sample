@@ -1,0 +1,12 @@
+language: python
+
+python:
+    - "2.7"
+before_install:
+    - pip install pytest pytest-cov
+
+install:
+    - python setup.py 
+
+script:
+    - py.test vis_sample/tests --cov vis_sample
