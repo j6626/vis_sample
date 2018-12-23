@@ -83,7 +83,6 @@ def vis_sample(imagefile=None, uvfile=None, uu=None, vv=None, mu_RA=0, mu_DEC=0,
     4. b) sample a second model using the same (u,v) points, this is faster now
     >> interp2 = vis_sample(imagefile="second_model.fits", gcf_holder = gcf_holder, corr_cache=corr_cache)
     """
-
     # Error cases #
     if not imagefile:
         print "Please supply an input imagefile to FFT and sample"
@@ -170,6 +169,23 @@ def vis_sample(imagefile=None, uvfile=None, uu=None, vv=None, mu_RA=0, mu_DEC=0,
             return
         else:
             print "WARNING: Number of channels in data does not match number of channels in model image. Interpolation can be completed, but model visibilities may not be able to be written to file."
+
+
+    #check that image resolution and uv coords are appropriate for one another
+    if gcf_holder:
+        maxuv = np.max((np.abs(gcf_holder.uu), np.abs(gcf_holder.vv)))
+    elif uvfile:
+        maxuv = np.max((np.abs(data_vis.uu), np.abs(data_vis.vv)))
+    else:
+        maxuv = np.max((uu,vv))
+
+    delt_l = np.abs(mod_sky_img.ra[1]-mod_sky_img.ra[0])
+ 
+    delt_m = np.abs(mod_sky_img.dec[1]-mod_sky_img.dec[0])
+
+    if maxuv >1/(2.*np.max((delt_l, delt_m)))*206265:
+        print "Image pixel resolution is not sufficient to interpolate longest baselines. Current resolution is %.5e arcsec. Minimum resolution is %.5e arcsec." % (np.max((delt_l, delt_m)),0.5/maxuv*206265)
+        sys.exit()
 
 
 
@@ -336,3 +352,64 @@ def vis_sample(imagefile=None, uvfile=None, uu=None, vv=None, mu_RA=0, mu_DEC=0,
     else:
         return interp
 
+def multispw_export(imagefile=None, uvfile = None, outfile = None, mu_RA=0, mu_DEC=0, src_distance=None):
+    """
+    Experimental function to apply vis_sample to an ms holding multiple SPWs with different shapes
+    """
+    import casac
+    shutil.copytree(uvfile, outfile)
+    tb = casac.casac.table()
+    tb.open(outfile, nomodify = False)
+    spwID = tb.getcol("DATA_DESC_ID")
+    uniqueSPW = np.unique(spwID)
+    c = 2.99792458e8 #speed of light in m/s
+
+    def find_breakpoints(spwID, spw_number):
+        """
+        based on DATA_DESC_ID array, figure out which rows to retrieve with getcol
+        """
+        locations = np.where(spwID == spw_number)[0]
+        startrow = [locations[0]]
+        nrow = []
+        firstrow = locations[0]
+        for i in range(1, len(locations)):
+            if locations[i]-locations[i-1]>1:
+                nrow.append(locations[i-1]-firstrow+1)
+                firstrow = locations[i]
+                startrow.append(firstrow)
+        #account for last occurrence of block of SPW correspondence
+        nrow.append(locations[-1]-startrow[-1]+1)
+        return np.array(startrow), np.array(nrow)
+
+    for spw_number in uniqueSPW:
+        tb2 = casac.casac.table()
+        tb2.open(outfile+"/SPECTRAL_WINDOW")
+        chanfreq = np.squeeze(tb2.getcol("CHAN_FREQ", startrow  = spw_number, nrow = 1))
+        tb2.close()
+        nchans = chanfreq.size
+
+        start, nrow = find_breakpoints(spwID, spw_number)
+        for i in range(len(start)):
+            #data shape is (2, nchan, nrow)
+
+            spw_uvw = tb.getcol("UVW", startrow = start[i], nrow = nrow[i]) #shape is (3, nrow) 
+            spw_uu = np.rollaxis(np.broadcast_to(spw_uvw[0],(nchans,nrow[i])),1)*chanfreq/c 
+            spw_vv = np.rollaxis(np.broadcast_to(spw_uvw[1],(nchans,nrow[i])),1)*chanfreq/c
+
+            #convert to lambda and broadcast to same shape as data
+
+            spw_uu = np.rollaxis(spw_uu, 1)
+            spw_vv = np.rollaxis(spw_vv, 1)
+            
+            #using mean u and v values for testing purposes right now
+            interp_vis = vis_sample(imagefile=imagefile, uu=np.squeeze(np.mean(spw_uu,axis = 0)), vv=np.squeeze(np.mean(spw_vv,axis = 0)), mu_RA=mu_RA, mu_DEC=mu_DEC, src_distance=src_distance) 
+            data_array = np.zeros((2, nchans, nrow[i])).astype(complex)
+
+
+            data_array[0,:,:] = interp_vis #set xx values
+            data_array[1,:,:] = interp_vis #set yy values
+            tb.putcol("DATA", data_array, startrow = start[i], nrow = nrow[i])
+   
+    tb.flush()
+    tb.close()
+    

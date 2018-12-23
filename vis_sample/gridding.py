@@ -14,14 +14,11 @@ import time
 def spheroid(eta=0):
     """
     Calculate value of spheroidal function used for gridding convolution function at a given value eta
-
     The rational approximation for this function is presented in F.R. Schwab's "Optimal Gridding of Visibility Data in Radio Interferometry" in Indirect Imaging: Measurement and Processing for Indirect Imaging, 1984
     m=5, alpha = 1
-
     Parameter
     _________
     eta: float between -1 and 1 
-
     Returns
     _______
     out: float. Value of spheroidal function at eta
@@ -53,12 +50,10 @@ def gcffun(etas):
 
 def apply_corrfun(img, corr_cache=None):
     """Applies correction function to sky brightness image
-
     Parameters
     __________
     img: SkyImage object (required)
     corr_cache: ndarray (optional) 2D array that is the same shape as img.data (i.e., the number of elements in each dimension is equal to the number of pixels along that dimension in the original image file). Feeding this array in as a parameter avoids having to recalculate the correction function in vis_sample
-
     Returns
     _______
     corr_cache: ndarray. 2D array that is the same shape as img.data (i.e., the number of elements in each dimension is equal to the number of pixels along that dimension in the original image file). Feeding this array in as a parameter avoids having to recalculate the correction function in vis_sample
@@ -93,7 +88,4 @@ def apply_corrfun(img, corr_cache=None):
         img.data[:,:,k] = img.data[:,:,k]*corr_cache
 
     return corr_cache
-
-
-
 
