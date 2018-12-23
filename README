@@ -1,3 +1,7 @@
+[![Build Status](https://travis-ci.org/j6626/vis_sample.svg?branch=master)](https://travis-ci.org/j6626/vis_sample.svg?branch=master)
+
+[![Coverage Status](https://coveralls.io/repos/github/j6626/vis_sample/badge.svg?branch=master)](https://coveralls.io/github/j6626/vis_sample?branch=master)
+
 vis_sample - Python Package for visibility sampling
 ====================================================
 
