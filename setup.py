@@ -29,7 +29,7 @@ setup (
         'python >= 2.7.0',
         'numpy >= 1.13.1',
         'scipy >= 0.19.1',
-        'astropy >= 1.0.0'
+        'astropy >= 1.0.0,<3.0.0'
     ],
 
     author = 'Ryan Loomis',
