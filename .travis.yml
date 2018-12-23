@@ -6,7 +6,7 @@ before_install:
     - pip install pytest pytest-cov
 
 install:
-    - python setup.py 
+    - python setup.py develop
 
 script:
     - py.test vis_sample/tests --cov vis_sample
