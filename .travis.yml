@@ -14,13 +14,10 @@ install:
   - hash -r
   - conda config --set always_yes yes --set changeps1 no
   - conda update -q conda
-  # Useful for debugging any issues with conda
-  - conda info -a
-
-  # Replace dep1 dep2 ... with your dependencies
   - conda create -q -n test-environment python=$TRAVIS_PYTHON_VERSION pytest pytest-cov coveralls
-  - source activate test-environment
   - conda config --append channels pkgw-forge
+  - conda info -a
+  - source activate test-environment
   - conda install casa-python casa-data
   - python setup.py develop
 
