@@ -24,7 +24,7 @@ install:
   # Replace dep1 dep2 ... with your dependencies
   - conda create -q -n test-environment python=$TRAVIS_PYTHON_VERSION 
   - source activate test-environment
-  - conda install -c pkgw casa-python casa-data
+  - conda install -c pkgw-forge casa-python casa-data
   - python setup.py develop
 
 script:
