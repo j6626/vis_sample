@@ -13,13 +13,11 @@ install:
   - bash miniconda.sh -b -p $HOME/miniconda
   - export PATH="$HOME/miniconda/bin:$PATH"
   - hash -r
-  - conda config --set always_yes yes --set changeps1 no
+  - conda config --set always_yes yes --set changeps1 no --append channels pkgw-forge
   - conda update -q conda
-  - conda create -q -n test-environment python=$TRAVIS_PYTHON_VERSION pytest pytest-cov coveralls
-  - conda config --append channels pkgw-forge
+  - conda create -q -n test-environment python=$TRAVIS_PYTHON_VERSION pytest pytest-cov coveralls casa-python casa-data
   - conda info -a
   - source activate test-environment
-  - conda install casa-python casa-data
   - python setup.py develop
 
 script:
