@@ -23,8 +23,10 @@ def uvgaussian(u,v):
     
 
 def test_vis_sample():
-    data_vis = import_data_ms('testfile.ms')
-    interp_vis = vis_sample(imagefile = 'gaussiantestmodel.fits', uvfile = 'testfile.ms', mu_RA = 0, mu_DEC = 0)
+    msname = os.path.join(os.path.dirname(__file__), 'testfile.ms')
+    imagename =  os.path.join(os.path.dirname(__file__), 'gaussiantestmodel.fits')
+    data_vis = import_data_ms(msname)
+    interp_vis = vis_sample(imagefile = imagename, uvfile = msname, mu_RA = 0, mu_DEC = 0)
     print(interp_vis[:10])
     print(uvgaussian(data_vis.uu[:10], data_vis.vv[:10]))
 
