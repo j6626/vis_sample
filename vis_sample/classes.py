@@ -1,5 +1,5 @@
 import numpy as np
-from gridding import *
+from .gridding import *
 
 # SkyImage is a holder that has both RA and DEC increasing with array index
 # This convention is necessary for the FFT step

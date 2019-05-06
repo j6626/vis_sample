@@ -3,10 +3,9 @@
 # we estimate the gcf by precalculating the gcf for a dense grid (1000x image res) and
 # then use these gcf values (for a massive speed increase)
 import numpy as np
-from gridding import *
-from classes import *
 from numpy.lib.stride_tricks import as_strided
-
+from .gridding import *
+from .classes import *
 
 
 # Calculate the gcf values for 5 fft image points around the dense grid points
@@ -63,6 +62,9 @@ def create_gcf_holder(uu, vv, vis):
         iv0 = npix_v/2 + np.round((vv/dv)).astype(int)
 
     index_arr = np.transpose(np.array((iu0, iv0)))
+
+    iu0 = iu0.astype(int)
+    iv0 = iv0.astype(int)
 
     # 2. Find the relative distance to this point (should be -0.5 du/v < val < 0.5 du/v) 
     u0 = uu - vis.uu[iu0]
