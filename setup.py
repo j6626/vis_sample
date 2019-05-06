@@ -28,7 +28,7 @@ setup (
     install_requires = [
         'python >= 2.7.0',
         'numpy >= 1.13.1',
-        'scipy >= 0.19.1',
+        'scipy >= 0.19.1,<=1.2.0',
         'astropy >= 1.0.0,<3.0.0'
     ],
 
